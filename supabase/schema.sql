@@ -61,3 +61,12 @@ create policy "equipe acessa historico" on public.historico
   for all to authenticated
   using (true)
   with check (true);
+
+-- 5) Permissões explícitas da API (Data API).
+--    Funciona mesmo com "Automatically expose new tables" DESLIGADO na criação do projeto
+--    (recomendado pelo Supabase): só usuários logados acessam; visitantes anônimos não têm acesso nenhum.
+grant usage on schema public to authenticated;
+grant select, insert, update, delete on public.vistorias to authenticated;
+grant select, insert, update, delete on public.historico to authenticated;
+revoke all on public.vistorias from anon;
+revoke all on public.historico from anon;
