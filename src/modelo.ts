@@ -187,6 +187,54 @@ export function mascararDocumento(valor: string): string {
     .replace(/(\d{4})(\d{1,2})$/, '$1-$2')
 }
 
+export type SituacaoDocumento = 'vazio' | 'ok' | 'incompleto' | 'invalido'
+
+function cpfValido(n: string): boolean {
+  if (/^(\d)\1{10}$/.test(n)) return false // 000.000.000-00, 111.111.111-11...
+  const dv = (ate: number) => {
+    let soma = 0
+    for (let i = 0; i < ate; i++) soma += Number(n[i]) * (ate + 1 - i)
+    const r = (soma * 10) % 11
+    return r === 10 ? 0 : r
+  }
+  return dv(9) === Number(n[9]) && dv(10) === Number(n[10])
+}
+
+function cnpjValido(n: string): boolean {
+  if (/^(\d)\1{13}$/.test(n)) return false
+  const dv = (pesos: number[]) => {
+    const soma = pesos.reduce((s, p, i) => s + p * Number(n[i]), 0)
+    const r = soma % 11
+    return r < 2 ? 0 : 11 - r
+  }
+  const p1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
+  return dv(p1) === Number(n[12]) && dv([6, ...p1]) === Number(n[13])
+}
+
+/**
+ * Confere CPF (11 dígitos) ou CNPJ (14 dígitos) pelos dígitos verificadores.
+ * Não consulta a Receita: só detecta documento incompleto ou digitado errado.
+ */
+export function validarDocumento(doc: string): { situacao: SituacaoDocumento; mensagem: string } {
+  const n = doc.replace(/\D/g, '')
+  if (n.length === 0) return { situacao: 'vazio', mensagem: '' }
+  if (n.length < 11) {
+    const faltam = 11 - n.length
+    return { situacao: 'incompleto', mensagem: `CPF incompleto: falta${faltam > 1 ? 'm' : ''} ${faltam} dígito${faltam > 1 ? 's' : ''}` }
+  }
+  if (n.length === 11) {
+    return cpfValido(n)
+      ? { situacao: 'ok', mensagem: '' }
+      : { situacao: 'invalido', mensagem: 'CPF inválido: confira os números' }
+  }
+  if (n.length < 14) {
+    return { situacao: 'incompleto', mensagem: 'Documento incompleto: CPF tem 11 dígitos e CNPJ tem 14' }
+  }
+  return cnpjValido(n)
+    ? { situacao: 'ok', mensagem: '' }
+    : { situacao: 'invalido', mensagem: 'CNPJ inválido: confira os números' }
+}
+
 export function rotuloDocumento(doc: string): string {
   return doc.replace(/\D/g, '').length > 11 ? 'CNPJ' : 'CPF'
 }

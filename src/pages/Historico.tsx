@@ -24,9 +24,20 @@ function textoBusca(r: RegistroHistorico): string {
   return normalizar(partes.join(' '))
 }
 
-/** Permite quebrar a linha logo após o "@" (em vez de no meio do domínio) em telas estreitas. */
-function quebravel(email: string): string {
-  return email.replace('@', '@​')
+/**
+ * Permite quebrar a linha logo após o "@" (em vez de no meio do domínio) em telas estreitas.
+ * Usa <wbr>, que não entra no texto quando o e-mail é copiado.
+ */
+function quebravel(email: string) {
+  const i = email.indexOf('@')
+  if (i < 0) return email
+  return (
+    <>
+      {email.slice(0, i + 1)}
+      <wbr />
+      {email.slice(i + 1)}
+    </>
+  )
 }
 
 function dataHora(iso: string): string {
@@ -87,7 +98,7 @@ export default function Historico({ repo }: { repo: Repositorio }) {
         <Icone nome="busca" tamanho={17} />
         <input
           type="search"
-          placeholder="E-mail, vistoriador, endereço, locatário, CPF ou Imb"
+          placeholder="Vistoriador, e-mail, endereço, locatário, CPF ou Imb"
           aria-label="Buscar no histórico"
           value={busca}
           onChange={(e) => setBusca(e.target.value)}
@@ -138,7 +149,7 @@ export default function Historico({ repo }: { repo: Repositorio }) {
                     <th>Imóvel</th>
                     <th className="col-larga">Data</th>
                     <th className="col-larga">Tipo</th>
-                    <th>Feita por</th>
+                    <th>Vistoriador · Laudo por</th>
                     <th className="col-seta" aria-hidden="true" />
                   </tr>
                 </thead>
@@ -170,7 +181,9 @@ export default function Historico({ repo }: { repo: Repositorio }) {
                           <td className="col-larga">{r.tipo === 'entrada' ? 'Entrada' : 'Saída'}</td>
                           <td>
                             <span className="celula-titulo">{r.vistoriador || '—'}</span>
-                            <span className="celula-sub celula-email">{email ? quebravel(email) : 'login não registrado'}</span>
+                            <span className="celula-sub celula-email">
+                              {email ? <>Laudo: {quebravel(email)}</> : 'Laudo: não registrado'}
+                            </span>
                           </td>
                           <td className="col-seta" aria-hidden="true">
                             <Icone nome={expandido ? 'baixo' : 'direita'} tamanho={15} />
@@ -201,7 +214,14 @@ export default function Historico({ repo }: { repo: Repositorio }) {
                                   <dt>Vistoriador</dt>
                                   <dd>
                                     {r.vistoriador || '—'}
-                                    <small>Login: {email || 'não registrado'}</small>
+                                    <small>quem esteve no imóvel</small>
+                                  </dd>
+                                </div>
+                                <div className="linha linha-info">
+                                  <dt>Laudo montado por</dt>
+                                  <dd>
+                                    {email || 'não registrado'}
+                                    <small>login usado no sistema</small>
                                   </dd>
                                 </div>
                                 <div className="linha linha-info">

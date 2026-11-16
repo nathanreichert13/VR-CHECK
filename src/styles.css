@@ -536,3 +536,7 @@ html[data-transicao='voltar']::view-transition-new(root) { animation-name: entra
   .so-celular { display: inline; }
   .tabela-historico td, .tabela-historico th { padding-left: 10px; padding-right: 10px; }
 }
+
+/* Aviso de CPF/CNPJ incompleto ou inválido */
+input.invalido { box-shadow: inset 0 0 0 1.5px var(--laranja); }
+.campo-aviso { font-size: 13px; color: var(--laranja); padding-left: 2px; line-height: 1.3; }

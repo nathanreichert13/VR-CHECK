@@ -7,7 +7,8 @@ import Pessoas from '../components/Pessoas'
 import SecaoCard from '../components/SecaoCard'
 import { redimensionar } from '../lib/imagens'
 import { irPara } from '../lib/rota'
-import { mascararDocumento, novaSecao, novoMedidor, paraHistorico, todasFotos } from '../modelo'
+import { novaSecao, novoMedidor, paraHistorico, todasFotos, validarDocumento } from '../modelo'
+import CampoDocumento from '../components/CampoDocumento'
 import type { Repositorio } from '../storage/repo'
 import type { FotoRef, Secao, Vistoria } from '../types'
 
@@ -237,6 +238,16 @@ export default function Editor({ id, repo }: Props) {
     if (x.locatarios.some((l) => l.nome.trim() && !l.documento.trim())) p.push('CPF do locatário')
     if (!x.vistoriador.trim()) p.push('Vistoriador')
     if (!x.administradora.nome.trim()) p.push('Administradora')
+    // Documentos preenchidos com erro (incompleto ou dígito verificador que não bate)
+    const docs = [
+      ...x.locatarios.map((l, i) => ({ quem: `locatário ${l.nome.trim() || i + 1}`, doc: l.documento })),
+      ...x.testemunhas.map((t, i) => ({ quem: `testemunha ${t.nome.trim() || i + 1}`, doc: t.documento })),
+      { quem: 'administradora', doc: x.administradora.documento },
+    ]
+    for (const { quem, doc } of docs) {
+      const { situacao, mensagem } = validarDocumento(doc)
+      if (situacao === 'incompleto' || situacao === 'invalido') p.push(`${mensagem} (${quem})`)
+    }
     const vazios = x.comodos.filter((c) => !c.descricao.trim() && c.fotos.length === 0).map((c) => c.nome)
     if (vazios.length) p.push(`Cômodos vazios (não irão para o laudo): ${vazios.join(', ')}`)
     return p
@@ -246,7 +257,7 @@ export default function Editor({ id, repo }: Props) {
     if (!v) return
     const nome = NOME_FORMATO[formato]
     const p = conferir ? pendencias(v) : []
-    if (p.length && !confirm(`Atenção, faltam:\n\n• ${p.join('\n• ')}\n\nGerar o ${nome} mesmo assim?`)) return
+    if (p.length && !confirm(`Atenção, confira antes de gerar:\n\n• ${p.join('\n• ')}\n\nGerar o ${nome} mesmo assim?`)) return
     setErro(null)
     setGerado(null)
     setGerando({ etapa: 'Preparando…' })
@@ -524,14 +535,11 @@ export default function Editor({ id, repo }: Props) {
                 onChange={(e) => campo('administradora', { ...v.administradora, nome: e.target.value })}
               />
             </label>
-            <label className="campo">
-              <span>CNPJ / CPF da administradora</span>
-              <input
-                inputMode="numeric"
-                value={v.administradora.documento}
-                onChange={(e) => campo('administradora', { ...v.administradora, documento: mascararDocumento(e.target.value) })}
-              />
-            </label>
+            <CampoDocumento
+              rotulo="CNPJ / CPF da administradora"
+              valor={v.administradora.documento}
+              aoMudar={(documento) => campo('administradora', { ...v.administradora, documento })}
+            />
           </div>
           <Pessoas
             titulo="Testemunhas"

@@ -1,7 +1,8 @@
 import Segmentado from '../components/Segmentado'
 import { useState } from 'react'
 import { definirTema, useTema, type Tema } from '../lib/tema'
-import { carregarConfig, COMODOS_PADRAO, mascararDocumento, salvarConfig } from '../modelo'
+import { carregarConfig, COMODOS_PADRAO, salvarConfig } from '../modelo'
+import CampoDocumento from '../components/CampoDocumento'
 import type { Configuracoes as Config } from '../types'
 
 export default function Configuracoes() {
@@ -44,14 +45,12 @@ export default function Configuracoes() {
           <span>Nome</span>
           <input value={c.administradoraNome} onChange={(e) => alterar('administradoraNome', e.target.value)} />
         </label>
-        <label className="campo sem-margem">
-          <span>CNPJ / CPF</span>
-          <input
-            inputMode="numeric"
-            value={c.administradoraDocumento}
-            onChange={(e) => alterar('administradoraDocumento', mascararDocumento(e.target.value))}
-          />
-        </label>
+        <CampoDocumento
+          className="sem-margem"
+          rotulo="CNPJ / CPF"
+          valor={c.administradoraDocumento}
+          aoMudar={(d) => alterar('administradoraDocumento', d)}
+        />
       </div>
 
       <h2 className="grupo-titulo">Padrões da vistoria</h2>
