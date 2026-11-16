@@ -38,7 +38,7 @@ export default function App() {
   const aba = rota.pagina === 'config' ? 'config' : rota.pagina === 'historico' ? 'historico' : 'lista'
   return (
     <Shell aba={aba} usuario={sessao?.user.email ?? null} aoSair={sair}>
-      {aba === 'config' ? <Configuracoes /> : aba === 'historico' ? <Historico repo={repo} /> : <Lista repo={repo} />}
+      {aba === 'config' ? <Configuracoes /> : aba === 'historico' ? <Historico repo={repo} /> : <Lista repo={repo} usuario={sessao?.user.email ?? null} />}
     </Shell>
   )
 }
