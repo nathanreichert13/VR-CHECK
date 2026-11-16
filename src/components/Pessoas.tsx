@@ -1,3 +1,4 @@
+import Icone from './Icone'
 import { mascararDocumento, novaPessoa } from '../modelo'
 import type { Pessoa } from '../types'
 
@@ -16,7 +17,7 @@ export default function Pessoas({ titulo, pessoas, aoMudar, rotuloAdicionar }: P
 
   return (
     <div className="pessoas">
-      <h3>{titulo}</h3>
+      <h3 className="subtitulo-campos">{titulo}</h3>
       {pessoas.map((p, i) => (
         <div key={p.id} className="pessoa">
           <label className="campo">
@@ -33,16 +34,17 @@ export default function Pessoas({ titulo, pessoas, aoMudar, rotuloAdicionar }: P
           </label>
           <button
             type="button"
-            className="btn icone perigo"
+            className="btn fantasma icone perigo"
             onClick={() => aoMudar(pessoas.filter((x) => x.id !== p.id))}
             aria-label="Remover"
+            title="Remover"
           >
-            ✕
+            <Icone nome="lixo" />
           </button>
         </div>
       ))}
-      <button type="button" className="btn" onClick={() => aoMudar([...pessoas, novaPessoa()])}>
-        + {rotuloAdicionar}
+      <button type="button" className="btn fantasma" onClick={() => aoMudar([...pessoas, novaPessoa()])}>
+        <Icone nome="mais" /> {rotuloAdicionar}
       </button>
     </div>
   )

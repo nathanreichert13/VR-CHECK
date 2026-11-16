@@ -1,3 +1,4 @@
+import Icone from './Icone'
 import { useRef } from 'react'
 import type { FotoRef } from '../types'
 
@@ -35,13 +36,13 @@ export default function Fotos({ fotos, urls, aoAdicionar, aoRemover, aoMover, oc
               )}
               <div className="controles-foto">
                 <button type="button" onClick={() => aoMover(f, -1)} disabled={i === 0} aria-label="Mover para a esquerda">
-                  ◀
+                  <Icone nome="voltar" tamanho={14} />
                 </button>
                 <button type="button" className="perigo" onClick={() => aoRemover(f)} aria-label="Remover foto">
-                  ✕
+                  <Icone nome="lixo" tamanho={14} />
                 </button>
                 <button type="button" onClick={() => aoMover(f, 1)} disabled={i === fotos.length - 1} aria-label="Mover para a direita">
-                  ▶
+                  <Icone nome="direita" tamanho={14} />
                 </button>
               </div>
             </figure>
@@ -50,12 +51,12 @@ export default function Fotos({ fotos, urls, aoAdicionar, aoRemover, aoMover, oc
       )}
       <div className="botoes-fotos">
         <button type="button" className="btn" onClick={() => camera.current?.click()} disabled={ocupado}>
-          📷 Câmera
+          <Icone nome="camera" /> Tirar foto
         </button>
         <button type="button" className="btn" onClick={() => galeria.current?.click()} disabled={ocupado}>
-          🖼️ Galeria / arquivos
+          <Icone nome="galeria" /> Galeria
         </button>
-        <span className="sutil">{fotos.length} foto{fotos.length === 1 ? '' : 's'}</span>
+
       </div>
       <input ref={camera} type="file" accept="image/*" capture="environment" hidden onChange={escolher} />
       <input ref={galeria} type="file" accept="image/*" multiple hidden onChange={escolher} />

@@ -1,4 +1,6 @@
+import Segmentado from '../components/Segmentado'
 import { useEffect, useMemo, useState } from 'react'
+import Icone from '../components/Icone'
 import { dataBR, rotuloDocumento } from '../modelo'
 import type { Repositorio } from '../storage/repo'
 import type { RegistroHistorico, TipoVistoria } from '../types'
@@ -54,99 +56,106 @@ export default function Historico({ repo }: { repo: Repositorio }) {
   }
 
   return (
-    <div className="pagina">
-      <header className="topo">
-        <a className="btn" href="#/">← Voltar</a>
-        <h1>Histórico</h1>
-      </header>
-      <p className="sutil">
-        Vistorias concluídas (laudo gerado e dados apagados). Ficam aqui só os dados para consulta, <strong>sem fotos</strong>.
-        O laudo completo está no arquivo PDF/Word que foi salvo.
-      </p>
+    <>
+      <h1 className="titulo-grande">Histórico</h1>
 
-      <div className="cartao filtros-historico">
+      <div className="busca">
+        <Icone nome="busca" tamanho={17} />
         <input
           type="search"
-          placeholder="Buscar por endereço, locatário, CPF, Imb ou contrato…"
+          placeholder="Endereço, locatário, CPF, Imb ou contrato"
+          aria-label="Buscar no histórico"
           value={busca}
           onChange={(e) => setBusca(e.target.value)}
         />
-        <div className="segmentado">
-          {(['todos', 'entrada', 'saida'] as const).map((t) => (
-            <button key={t} type="button" className={tipo === t ? 'ativo' : ''} onClick={() => setTipo(t)}>
-              {t === 'todos' ? 'Todas' : t === 'entrada' ? 'Entrada' : 'Saída'}
-            </button>
-          ))}
-        </div>
       </div>
+      <Segmentado
+        className="espaco-abaixo"
+        rotulo="Tipo de vistoria"
+        valor={tipo}
+        aoMudar={setTipo}
+        opcoes={[
+          { valor: 'todos', rotulo: 'Todas' },
+          { valor: 'entrada', rotulo: 'Entrada' },
+          { valor: 'saida', rotulo: 'Saída' },
+        ]}
+      />
 
-      {erro && <p className="erro">{erro}</p>}
-      {itens === null && !erro && <p className="sutil">Carregando…</p>}
-      {itens?.length === 0 && <p className="sutil">Nenhuma vistoria concluída ainda.</p>}
+      {erro && (
+        <div className="aviso-erro" role="alert">
+          <pre>{erro}</pre>
+        </div>
+      )}
+      {itens === null && !erro && <p className="nota">Carregando…</p>}
+      {itens?.length === 0 && (
+        <div className="vazio">
+          <Icone nome="historico" tamanho={44} />
+          <h3>Nenhuma vistoria concluída</h3>
+          <p>Quando você gerar o laudo e apagar os dados de uma vistoria, o registro aparece aqui.</p>
+        </div>
+      )}
       {itens && itens.length > 0 && (
-        <p className="sutil">
-          {filtrados.length} de {itens.length} vistoria{itens.length === 1 ? '' : 's'}
+        <p className="nota sem-margem-topo">
+          {filtrados.length} de {itens.length} vistoria{itens.length === 1 ? '' : 's'}. Ficam só os dados para consulta, sem
+          fotos: o laudo completo está no arquivo salvo.
         </p>
       )}
 
-      <ul className="lista">
-        {filtrados.map((r) => (
-          <li key={r.id} className="cartao item-historico">
-            <div className="item-titulo">
-              <strong>{r.endereco || 'Sem endereço'}</strong>
-              <span className={`selo ${r.tipo === 'entrada' ? '' : 'saida'}`}>
-                {r.tipo === 'entrada' ? 'Entrada' : 'Saída'}
+      {filtrados.map((r) => (
+        <section key={r.id} className="grupo registro">
+          <div className="linha">
+            <div className="linha-corpo">
+              <span className="linha-titulo">{r.endereco.split('\n')[0] || 'Sem endereço'}</span>
+              <span className="linha-sub">
+                Vistoria de {r.tipo === 'entrada' ? 'entrada' : 'saída'} · {dataBR(r.dataVistoria)}
               </span>
             </div>
-            <dl className="dados-historico">
-              {r.locatarios.map((l, i) => (
-                <div key={i}>
-                  <dt>Locatário(a)</dt>
-                  <dd>
-                    {l.nome || '—'}
-                    {l.documento && ` · ${rotuloDocumento(l.documento)} ${l.documento}`}
-                  </dd>
-                </div>
-              ))}
-              <div>
-                <dt>Data da vistoria</dt>
-                <dd>{dataBR(r.dataVistoria)}</dd>
-              </div>
-              {(r.imb || r.contrato) && (
-                <div>
-                  <dt>Imb / Contrato</dt>
-                  <dd>
-                    {r.imb || '—'} / {r.contrato || '—'}
-                  </dd>
-                </div>
-              )}
-              <div>
-                <dt>Vistoriador</dt>
-                <dd>{r.vistoriador || '—'}</dd>
-              </div>
-              <div>
-                <dt>Laudo</dt>
+          </div>
+          <dl>
+            {r.locatarios.map((l, i) => (
+              <div key={i} className="linha linha-info">
+                <dt>Locatário</dt>
                 <dd>
-                  {r.formatos.map((f) => NOME_FORMATO[f]).join(' e ') || '—'} · gerado em {dataHora(r.laudoGeradoEm)} ·{' '}
-                  {r.totalComodos} cômodo{r.totalComodos === 1 ? '' : 's'}, {r.totalFotos} foto{r.totalFotos === 1 ? '' : 's'}
+                  {l.nome || '—'}
+                  {l.documento && <small>{`${rotuloDocumento(l.documento)} ${l.documento}`}</small>}
                 </dd>
               </div>
-              <div>
-                <dt>Concluída</dt>
+            ))}
+            {(r.imb || r.contrato) && (
+              <div className="linha linha-info">
+                <dt>Imb / Contrato</dt>
                 <dd>
-                  {dataHora(r.concluidoEm)}
-                  {r.concluidoPor && ` por ${r.concluidoPor}`}
+                  {r.imb || '—'} / {r.contrato || '—'}
                 </dd>
               </div>
-            </dl>
-            <div className="acoes-historico">
-              <button type="button" className="btn perigo" onClick={() => excluir(r)}>
-                Remover do histórico
-              </button>
+            )}
+            <div className="linha linha-info">
+              <dt>Vistoriador</dt>
+              <dd>{r.vistoriador || '—'}</dd>
             </div>
-          </li>
-        ))}
-      </ul>
-    </div>
+            <div className="linha linha-info">
+              <dt>Laudo</dt>
+              <dd>
+                {r.formatos.map((f) => NOME_FORMATO[f]).join(' e ') || '—'}
+                <small>
+                  {dataHora(r.laudoGeradoEm)} · {r.totalComodos} cômodo{r.totalComodos === 1 ? '' : 's'}, {r.totalFotos} foto
+                  {r.totalFotos === 1 ? '' : 's'}
+                </small>
+              </dd>
+            </div>
+            <div className="linha linha-info">
+              <dt>Concluída</dt>
+              <dd>
+                {dataHora(r.concluidoEm)}
+                {r.concluidoPor && <small>{r.concluidoPor}</small>}
+              </dd>
+            </div>
+          </dl>
+          <button type="button" className="linha linha-botao perigo" onClick={() => excluir(r)}>
+            Remover do histórico
+          </button>
+        </section>
+      ))}
+    </>
   )
 }

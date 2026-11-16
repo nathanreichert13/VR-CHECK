@@ -1,3 +1,4 @@
+import Icone from './Icone'
 import { useRef } from 'react'
 import { ditadoSuportado, juntarTexto, useDitado } from '../lib/ditado'
 
@@ -30,13 +31,13 @@ export default function Descricao({ valor, aoMudar, placeholder }: Props) {
       {ouvindo && parcial && <p className="parcial">{parcial}…</p>}
       <div className="linha-ditado">
         {ditadoSuportado ? (
-          <button type="button" className={`btn ${ouvindo ? 'gravando' : ''}`} onClick={ouvindo ? parar : iniciar}>
-            {ouvindo ? '⏹ Parar ditado' : '🎤 Ditar'}
+          <button type="button" className={`btn pequeno ${ouvindo ? 'gravando' : ''}`} onClick={ouvindo ? parar : iniciar}>
+            <Icone nome={ouvindo ? 'parar' : 'microfone'} /> {ouvindo ? 'Parar ditado' : 'Ditar'}
           </button>
         ) : (
-          <span className="sutil">Dica: use o microfone do teclado do celular para ditar.</span>
+          <span className="nota-inline">Dica: use o microfone do teclado do celular para ditar.</span>
         )}
-        {ouvindo && <span className="sutil">Ouvindo… fale normalmente</span>}
+        {ouvindo && <span className="nota-inline">Ouvindo… fale normalmente</span>}
       </div>
       {erro && <p className="erro">{erro}</p>}
     </div>
