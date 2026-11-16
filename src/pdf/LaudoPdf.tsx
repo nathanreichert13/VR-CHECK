@@ -9,7 +9,10 @@ Font.registerHyphenationCallback((palavra) => [palavra])
 const BORDA = '#000'
 
 const s = StyleSheet.create({
-  pagina: { paddingTop: 34, paddingBottom: 40, paddingHorizontal: 40, fontFamily: 'Helvetica', fontSize: 10, lineHeight: 1.25 },
+  // Sem lineHeight na página: herdado pelo rodapé dinâmico, ele faz o "Página X de Y" sumir (bug do react-pdf).
+  // O espaçamento vai no conteúdo, em pontos (10pt × 1,25): sem unidade, o react-pdf calcula sobre 18pt.
+  pagina: { paddingTop: 34, paddingBottom: 40, paddingHorizontal: 40, fontFamily: 'Helvetica', fontSize: 10 },
+  conteudo: { lineHeight: '12.5pt' },
   titulo: { fontFamily: 'Helvetica-Bold', fontSize: 12, textAlign: 'center', marginBottom: 8 },
   subtitulo: { fontFamily: 'Helvetica-Bold', fontSize: 11, textAlign: 'center', marginBottom: 10 },
   tabela: { borderTopWidth: 1, borderColor: BORDA },
@@ -92,6 +95,11 @@ export default function LaudoPdf({ v, urls }: { v: Vistoria; urls: Urls }) {
   return (
     <Document title={`Vistoria de ${tipo} - ${v.endereco}`} author={v.administradora.nome} creator="VR-CHECK" language="pt-BR">
       <Page size="A4" style={s.pagina}>
+        {/* Rodapé fixo, repetido em todas as páginas. */}
+        <View style={s.rodape} fixed>
+          <Text render={({ pageNumber, totalPages }) => `Página ${pageNumber} de ${totalPages}`} />
+        </View>
+        <View style={s.conteudo}>
         <Text style={s.titulo}>Vistoria de {tipo} do imóvel</Text>
         <Text style={s.subtitulo}>Data: {dataBR(v.data)}</Text>
 
@@ -202,8 +210,7 @@ export default function LaudoPdf({ v, urls }: { v: Vistoria; urls: Urls }) {
             </View>
           </View>
         )}
-
-        <Text style={s.rodape} render={({ pageNumber, totalPages }) => `Página ${pageNumber} de ${totalPages}`} fixed />
+        </View>
       </Page>
     </Document>
   )
