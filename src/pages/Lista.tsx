@@ -7,6 +7,8 @@ import type { ResumoVistoria, TipoVistoria } from '../types'
 
 interface Props {
   repo: Repositorio
+  /** E-mail do login atual (null no modo local). */
+  usuario: string | null
 }
 
 function haQuanto(iso: string): string {
@@ -21,7 +23,7 @@ function haQuanto(iso: string): string {
   return d === 1 ? 'Ontem' : dataBR(iso.slice(0, 10))
 }
 
-export default function Lista({ repo }: Props) {
+export default function Lista({ repo, usuario }: Props) {
   const [itens, setItens] = useState<ResumoVistoria[] | null>(null)
   const [erro, setErro] = useState<string | null>(null)
   const [criando, setCriando] = useState<TipoVistoria | null>(null)
@@ -33,7 +35,7 @@ export default function Lista({ repo }: Props) {
   async function nova(tipo: TipoVistoria) {
     setCriando(tipo)
     try {
-      const v = { ...criarVistoria(carregarConfig()), tipo }
+      const v = { ...criarVistoria(carregarConfig()), tipo, criadoPor: usuario ?? '' }
       await repo.salvar(v)
       irPara(`/v/${v.id}`)
     } catch (e) {

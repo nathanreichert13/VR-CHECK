@@ -57,6 +57,8 @@ export interface Vistoria {
   atualizadoEm: string
   /** Laudos baixados desta vistoria (opcional: vistorias antigas não têm). */
   laudosGerados?: { formato: 'pdf' | 'docx'; em: string }[]
+  /** E-mail do login que criou a vistoria (modo nuvem; vistorias antigas não têm). */
+  criadoPor?: string
 }
 
 /**
@@ -83,6 +85,11 @@ export interface RegistroHistorico {
   concluidoEm: string
   /** E-mail de quem concluiu (modo nuvem). */
   concluidoPor: string
+  /**
+   * E-mail do login que criou/fez a vistoria. Pode ser diferente do nome em "vistoriador"
+   * (ex.: o login de uma pessoa preenchendo a vistoria em nome de outra). Registros antigos não têm.
+   */
+  criadoPor?: string
 }
 
 export interface ResumoVistoria {

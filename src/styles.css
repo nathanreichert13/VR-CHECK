@@ -506,3 +506,33 @@ html[data-transicao='voltar']::view-transition-new(root) { animation-name: entra
 @media (prefers-reduced-transparency: reduce) {
   .vidro, .navbar, .modal { background: var(--grupo); -webkit-backdrop-filter: none; backdrop-filter: none; }
 }
+
+/* Histórico em tabela: linha clicável abre os detalhes logo abaixo */
+.tabela-historico-moldura { overflow-x: auto; }
+.tabela-historico { width: 100%; border-collapse: collapse; font-size: 15px; }
+.tabela-historico th {
+  text-align: left; font-size: 13px; font-weight: 400; text-transform: uppercase; letter-spacing: 0.02em;
+  color: var(--texto-2); padding: 10px 12px 8px; border-bottom: 0.5px solid var(--separador); white-space: nowrap;
+}
+.tabela-historico td { padding: 11px 12px; vertical-align: middle; border-top: 0.5px solid var(--separador); }
+.tabela-historico tbody tr:first-child td { border-top: 0; }
+.tabela-historico th:first-child, .tabela-historico td:first-child { padding-left: 16px; }
+.linha-tabela { cursor: pointer; }
+.linha-tabela:hover { background: var(--preenchimento); }
+.linha-tabela:active { background: var(--preenchimento-forte); }
+.linha-tabela:focus-visible { outline: 2px solid var(--destaque); outline-offset: -2px; }
+.linha-tabela.aberta { background: var(--preenchimento); }
+.celula-titulo { display: block; font-weight: 600; color: var(--texto); overflow-wrap: anywhere; }
+.celula-sub { display: block; font-size: 13px; color: var(--texto-2); overflow-wrap: anywhere; margin-top: 2px; }
+.col-seta { width: 28px; color: var(--texto-3); text-align: right; }
+.col-larga { white-space: nowrap; color: var(--texto-2); }
+.so-celular { display: none; }
+.celula-email { overflow-wrap: break-word; }
+.linha-detalhe > td { padding: 0; background: var(--fundo); border-top: 0.5px solid var(--separador); }
+.linha-detalhe dl { margin: 0; background: var(--grupo); }
+.linha-detalhe .linha-botao { width: 100%; border: 0; background: var(--grupo); font: inherit; }
+@media (max-width: 600px) {
+  .tabela-historico .col-larga { display: none; }
+  .so-celular { display: inline; }
+  .tabela-historico td, .tabela-historico th { padding-left: 10px; padding-right: 10px; }
+}

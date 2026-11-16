@@ -149,6 +149,7 @@ export function paraHistorico(v: Vistoria): RegistroHistorico {
     laudoGeradoEm: laudos[0]?.em ?? agora,
     concluidoEm: agora,
     concluidoPor: '',
+    criadoPor: v.criadoPor ?? '',
   }
 }
 
