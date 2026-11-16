@@ -1,5 +1,6 @@
+import CampoDocumento from './CampoDocumento'
 import Icone from './Icone'
-import { mascararDocumento, novaPessoa } from '../modelo'
+import { novaPessoa } from '../modelo'
 import type { Pessoa } from '../types'
 
 interface Props {
@@ -24,14 +25,12 @@ export default function Pessoas({ titulo, pessoas, aoMudar, rotuloAdicionar }: P
             <span>Nome {pessoas.length > 1 ? i + 1 : ''}</span>
             <input value={p.nome} onChange={(e) => alterar(p.id, 'nome', e.target.value)} />
           </label>
-          <label className="campo doc">
-            <span>CPF / CNPJ</span>
-            <input
-              inputMode="numeric"
-              value={p.documento}
-              onChange={(e) => alterar(p.id, 'documento', mascararDocumento(e.target.value))}
-            />
-          </label>
+          <CampoDocumento
+            className="doc"
+            rotulo="CPF / CNPJ"
+            valor={p.documento}
+            aoMudar={(d) => alterar(p.id, 'documento', d)}
+          />
           <button
             type="button"
             className="btn fantasma icone perigo"
